@@ -1,0 +1,32 @@
+.main { max-width: 400px; margin: 0 auto; padding: 56px 0; }
+.brand { font: 700 18px/1 var(--f-display); letter-spacing: .04em; text-transform: uppercase; margin-bottom: 24px; }
+.brand span { color: var(--accent); }
+
+.form {
+  display: grid; gap: 16px;
+  background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 24px;
+}
+.title { font-size: 22px; font-weight: 700; }
+
+.label { display: grid; gap: 6px; font-size: 14px; font-weight: 600; color: var(--ink-2); }
+.input {
+  font: inherit; font-weight: 400; color: var(--ink);
+  background: var(--surface-2); border: 1px solid var(--line-2); border-radius: 8px;
+  padding: 10px 12px; min-height: 44px;
+}
+.input:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+
+.button {
+  font: inherit; font-weight: 600; cursor: pointer;
+  background: var(--accent); color: var(--accent-ink);
+  border: 0; border-radius: 8px; padding: 12px; min-height: 44px;
+}
+.button:disabled { opacity: 0.6; cursor: wait; }
+
+.error { color: var(--crit); background: var(--crit-soft); border-radius: 8px; padding: 10px 12px; font-size: 14px; }
+.message { color: var(--ok); background: var(--ok-soft); border-radius: 8px; padding: 10px 12px; font-size: 14px; }
+
+.switch { font-size: 14px; color: var(--ink-3); text-align: center; }
+.link { font: inherit; color: var(--accent); background: none; border: 0; padding: 0; cursor: pointer; text-decoration: underline; }
+.check { display: flex; gap: 10px; align-items: center; font-size: 14px; color: var(--ink-2); }
+.check input { width: 18px; height: 18px; accent-color: var(--accent); }

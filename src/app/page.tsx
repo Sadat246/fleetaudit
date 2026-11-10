@@ -1,5 +1,4 @@
 import {
-  buildSampleFleet,
   evaluateDriver,
   STATUS_RANK,
   todayIn,
@@ -9,11 +8,12 @@ import {
   type ItemKey,
 } from '@/lib/engine';
 import { Suspense } from 'react';
-import { connection } from 'next/server';
+import { redirect } from 'next/navigation';
+import { getMyCompany, loadFleet } from '@/lib/db/fleet';
+import { createClient } from '@/lib/supabase/server';
+import { signOut } from './login/actions';
+import { CompanyForm } from './setup/company-form';
 import styles from './page.module.css';
-
-// Until each company has its own setting (week 3).
-const TIME_ZONE = 'America/Chicago';
 
 const COLUMNS: [ItemKey, string][] = [
   ['app', 'Application'], ['inq', 'Prior employers'], ['mvr', 'MVR'], ['annual', 'Annual review'],
@@ -54,10 +54,23 @@ export default function RosterPage() {
 }
 
 async function Roster() {
-  // Render on every request (never cache), so "days left" is based on today.
-  await connection();
-  const today = todayIn(TIME_ZONE);
-  const { drivers, docs } = buildSampleFleet(today);
+  // Reads the login cookie, so this renders fresh on every request.
+  const supabase = await createClient();
+  const { data: claims } = await supabase.auth.getClaims();
+  if (!claims) redirect('/login');
+
+  const company = await getMyCompany(supabase);
+  if (!company) {
+    return (
+      <div className={styles.setup}>
+        <CompanyForm />
+        <SignOut email={claims.claims.email} />
+      </div>
+    );
+  }
+
+  const today = todayIn(company.timeZone);
+  const { drivers, docs } = await loadFleet(supabase, company.id);
 
   const rows = drivers
     .map((dr) => ({ dr, result: evaluateDriver(dr, docs.filter((d) => d.driverId === dr.id), today) }))
@@ -69,7 +82,7 @@ async function Roster() {
   return (
     <>
       <header className={styles.head}>
-        <p className={styles.sub}>Sample fleet · as of {fmtDate(today)}</p>
+        <p className={styles.sub}>{company.name} · as of {fmtDate(today)}</p>
         <p className={styles.summary}>
           <b>{counts.ok}</b> of {rows.length} audit-ready · <b className={styles.critText}>{counts.crit}</b> critical · <b className={styles.warnText}>{counts.warn}</b> warning
         </p>
@@ -101,7 +114,18 @@ async function Roster() {
             </tbody>
           </table>
         </div>
+        {rows.length === 0 && <p className={styles.empty}>No drivers yet. Adding drivers comes in Week 2.</p>}
       </section>
+      <SignOut email={claims.claims.email} />
     </>
+  );
+}
+
+function SignOut({ email }: { email?: string }) {
+  return (
+    <form action={signOut} className={styles.account}>
+      <span>Signed in as {email}</span>
+      <button type="submit" className={styles.signOut}>Sign out</button>
+    </form>
   );
 }

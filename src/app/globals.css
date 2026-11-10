@@ -1,0 +1,30 @@
+/* Colours and type from the prototype: highway signage and inspection decals. */
+:root {
+  --bg: #edf1f5; --surface: #fff; --surface-2: #f5f8fa; --line: #d6dfe8; --line-2: #b9c6d4;
+  --ink: #0e1a27; --ink-2: #3f5266; --ink-3: #5b6d80;
+  --accent: #12559e; --accent-ink: #fff; --accent-soft: #e2edf9;
+  --ok: #17703f; --ok-soft: #dff2e6; --ok-bar: #2e9e63;
+  --warn: #8f4e00; --warn-soft: #ffefd0; --warn-bar: #e7a21b;
+  --crit: #b3261e; --crit-soft: #fce5e2; --crit-bar: #d2382e;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0b131c; --surface: #121d29; --surface-2: #182636; --line: #243547; --line-2: #37506a;
+    --ink: #e7eef5; --ink-2: #aebdcc; --ink-3: #8496aa;
+    --accent: #5ca3f2; --accent-ink: #06121f; --accent-soft: #14304f;
+    --ok: #52c98d; --ok-soft: #10301f; --ok-bar: #3fb67a;
+    --warn: #f3b544; --warn-soft: #38290c; --warn-bar: #e7a21b;
+    --crit: #ff8077; --crit-soft: #3c1816; --crit-bar: #f0584d;
+    color-scheme: dark;
+  }
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html, body { margin: 0; }
+body {
+  background: var(--bg); color: var(--ink);
+  font: 400 16px/1.45 var(--f-body), system-ui, sans-serif;
+  padding: 0 16px; min-height: 100vh;
+}
+h1, h2, h3, p { margin: 0; }

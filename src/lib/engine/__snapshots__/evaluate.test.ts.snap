@@ -1,0 +1,18 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`sample fleet > scores the same way every time (update this snapshot only on purpose) 1`] = `
+[
+  "Marcus Webb: crit (OOS risk)",
+  "Denise Alvarez: warn",
+  "Tyrell Jackson: ok",
+  "Linda Okafor: ok",
+  "Raymond Pike: crit (OOS risk)",
+  "Sofia Marchetti: crit (OOS risk)",
+  "Caleb Nguyen: warn",
+  "Patricia Holloway: warn",
+  "Omar Haddad: ok",
+  "Jerome Baptiste: ok",
+  "Hannah Lindqvist: crit (OOS risk)",
+  "Walt Dreyer: ok",
+]
+`;

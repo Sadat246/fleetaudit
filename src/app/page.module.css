@@ -1,0 +1,48 @@
+.main { max-width: 1320px; margin: 0 auto; padding: 24px 0 48px; }
+
+.head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 12px 24px; margin-bottom: 18px; }
+.brand { font: 700 18px/1 var(--f-display); letter-spacing: .04em; text-transform: uppercase; margin-bottom: 14px; }
+.brand span { color: var(--accent); }
+.title { font: 700 clamp(30px, 5vw, 42px)/1 var(--f-display); letter-spacing: .015em; text-transform: uppercase; margin-bottom: 6px; }
+.sub { color: var(--ink-2); margin-top: 6px; }
+.summary { color: var(--ink-2); }
+.summary b { color: var(--ink); font: 700 22px/1 var(--f-display); }
+.summary .critText { color: var(--crit); }
+.summary .warnText { color: var(--warn); }
+
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; }
+.scroll { overflow-x: auto; }
+
+.table { border-collapse: separate; border-spacing: 0; width: 100%; min-width: 900px; }
+.table th {
+  font: 600 12px/1.15 var(--f-display); letter-spacing: .08em; text-transform: uppercase;
+  color: var(--ink-3); text-align: center; padding: 10px 4px; border-bottom: 1px solid var(--line); background: var(--surface-2);
+}
+.table td { padding: 8px 4px; border-bottom: 1px solid var(--line); text-align: center; }
+.table tr:last-child td { border-bottom: 0; }
+.table th:first-child, .table td:first-child {
+  text-align: left; position: sticky; left: 0; z-index: 1; padding-left: 18px; min-width: 200px;
+  background: var(--surface); box-shadow: 1px 0 0 var(--line);
+}
+.table th:first-child { background: var(--surface-2); }
+
+.name { display: block; font-weight: 600; }
+.meta { display: block; font-size: 12.5px; color: var(--ink-3); margin-top: 2px; }
+
+.cell {
+  display: inline-flex; align-items: center; justify-content: center; gap: 4px;
+  min-width: 62px; height: 36px; padding: 0 6px; border-radius: 5px; font: 500 12px/1 var(--f-mono);
+}
+.ok { background: var(--ok-soft); color: var(--ok); }
+.warn { background: var(--warn-soft); color: var(--warn); }
+.crit { background: var(--crit-soft); color: var(--crit); }
+.na { background: var(--surface-2); color: var(--ink-3); }
+.miss { border: 1.5px dashed var(--crit); color: var(--crit); background: none; }
+.missWarn { border-color: var(--warn); color: var(--warn); }
+
+.stamp {
+  display: inline-flex; padding: 5px 8px 4px; border: 1.5px solid currentColor; border-radius: 3px;
+  font: 700 12.5px/1 var(--f-display); letter-spacing: .09em; text-transform: uppercase; white-space: nowrap;
+}
+
+.foot { margin-top: 16px; font-size: 13px; color: var(--ink-3); }

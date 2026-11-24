@@ -9,6 +9,7 @@ import {
 } from '@/lib/engine';
 import { Suspense } from 'react';
 import { redirect } from 'next/navigation';
+import { connection } from 'next/server';
 import { getMyCompany, loadFleet } from '@/lib/db/fleet';
 import { createClient } from '@/lib/supabase/server';
 import { signOut } from './login/actions';
@@ -54,7 +55,9 @@ export default function RosterPage() {
 }
 
 async function Roster() {
-  // Reads the login cookie, so this renders fresh on every request.
+  // Always render fresh on each request: the login check and "days left"
+  // both depend on the current time, so this can't be prerendered.
+  await connection();
   const supabase = await createClient();
   const { data: claims } = await supabase.auth.getClaims();
   if (!claims) redirect('/login');

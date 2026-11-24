@@ -40,7 +40,11 @@ async function Overview() {
     );
   }
 
-  const { today, rows, counts } = await loadScoredFleet(supabase, company);
+  const [{ today, rows, counts }, waiting] = await Promise.all([
+    loadScoredFleet(supabase, company),
+    supabase.from('submissions').select('id', { count: 'exact', head: true }).eq('company_id', company.id).eq('status', 'pending'),
+  ]);
+  const inbox = waiting.count ?? 0;
   const fix = fixFirst(rows);
   const soon = dueWithin(rows, 30).filter((x) => x.item.days! >= 0);
 
@@ -52,6 +56,12 @@ async function Overview() {
           <p className={shell.sub}>Overview as of {fmtDate(today)}</p>
         </div>
       </header>
+
+      {inbox > 0 && (
+        <Link href="/inbox" className={styles.banner}>
+          <b>{inbox} driver upload{inbox === 1 ? '' : 's'}</b> waiting for review →
+        </Link>
+      )}
 
       <div className={styles.tiles}>
         <Tile label="Audit-ready" value={`${counts.ok} of ${counts.total}`} tone="ok" href="/drivers" />

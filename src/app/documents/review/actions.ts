@@ -31,6 +31,7 @@ const Form = z.object({
   waivers: list,
   sigDriver: z.boolean(),
   sigReviewer: z.boolean(),
+  submissionId: z.union([z.literal(''), z.uuid()]),
 });
 
 export async function saveDocument(_prev: SaveState, formData: FormData): Promise<SaveState> {
@@ -41,6 +42,7 @@ export async function saveDocument(_prev: SaveState, formData: FormData): Promis
     endorsements: str('endorsements'), restrictions: str('restrictions'),
     examiner: str('examiner'), nrcme: str('nrcme'), waivers: str('waivers'),
     sigDriver: formData.get('sigDriver') === 'on', sigReviewer: formData.get('sigReviewer') === 'on',
+    submissionId: str('submissionId'),
   });
   if (!parsed.success) return { error: parsed.error.issues[0].message };
   const f = parsed.data;
@@ -54,7 +56,7 @@ export async function saveDocument(_prev: SaveState, formData: FormData): Promis
   const keep = new Set(FIELDS[f.type]);
   const pick = <T,>(k: (typeof FIELDS)[keyof typeof FIELDS][number], v: T, empty: T) => (keep.has(k) ? v : empty);
 
-  const { error } = await supabase.from('documents').insert({
+  const { data: saved, error } = await supabase.from('documents').insert({
     company_id: company.id,
     driver_id: f.driverId,
     type: f.type,
@@ -70,8 +72,19 @@ export async function saveDocument(_prev: SaveState, formData: FormData): Promis
     // Types without a signature line count as signed, so they aren't flagged.
     sig_driver: pick('sigDriver', f.sigDriver, true),
     sig_reviewer: pick('sigReviewer', f.sigReviewer, true),
-  });
+  }).select('id').single();
   if (error) return { error: `Saving failed: ${error.message}` };
+
+  // A driver's upload: mark it done so it leaves the inbox.
+  if (f.submissionId) {
+    const { error: subError } = await supabase
+      .from('submissions')
+      .update({ status: 'accepted', reviewed_at: new Date().toISOString(), document_id: saved.id })
+      .eq('id', f.submissionId)
+      .eq('company_id', company.id)
+      .eq('photo_path', f.photo);
+    if (subError) return { error: `Saved, but couldn't clear it from the inbox: ${subError.message}` };
+  }
 
   redirect(`/drivers/${f.driverId}`);
 }

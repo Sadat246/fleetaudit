@@ -10,6 +10,7 @@ const LINKS = [
   { href: '/', label: 'Overview' },
   { href: '/drivers', label: 'Drivers' },
   { href: '/renewals', label: 'Renewals' },
+  { href: '/inbox', label: 'Inbox' },
 ];
 
 /** The page links. Reading the URL waits for the request, so this loads behind a boundary. */

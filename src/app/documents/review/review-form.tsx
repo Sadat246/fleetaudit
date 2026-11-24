@@ -14,9 +14,11 @@ interface Props {
   photo: string;
   checks: string[];
   notes: string[];
+  /** Set when this photo came from a driver's upload link. */
+  submissionId?: string;
 }
 
-export function ReviewForm({ draft, driverId, photo, checks, notes }: Props) {
+export function ReviewForm({ draft, driverId, photo, checks, notes, submissionId }: Props) {
   const [type, setType] = useState<DocType>(draft.type);
   const [state, action, pending] = useActionState(saveDocument, {} as SaveState);
   const show = new Set(FIELDS[type]);
@@ -48,6 +50,7 @@ export function ReviewForm({ draft, driverId, photo, checks, notes }: Props) {
 
       <input type="hidden" name="driverId" value={driverId} />
       <input type="hidden" name="photo" value={photo} />
+      {submissionId && <input type="hidden" name="submissionId" value={submissionId} />}
 
       <label className={styles.label}>
         Document type

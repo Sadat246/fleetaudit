@@ -16,3 +16,8 @@
 
 .more { margin-top: 10px; font-size: 14px; }
 .more a { color: var(--accent); }
+
+.banner {
+  display: block; margin-bottom: 16px; padding: 14px 18px; border-radius: 10px; text-decoration: none;
+  background: var(--accent-soft); color: var(--accent); border: 1px solid var(--accent);
+}

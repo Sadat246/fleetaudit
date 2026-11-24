@@ -13,6 +13,8 @@ import styles from '../documents.module.css';
 
 export const metadata: Metadata = { title: 'Review document · FleetAudit' };
 
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
 export default function ReviewPage(props: PageProps<'/documents/review'>) {
   return (
     <main className={`${shell.main} ${shell.narrow}`}>
@@ -28,8 +30,10 @@ export default function ReviewPage(props: PageProps<'/documents/review'>) {
 
 async function Review({ searchParams }: { searchParams: PageProps<'/documents/review'>['searchParams'] }) {
   const { supabase, company } = await requireCompany();
-  const { driver: driverId, photo } = await searchParams;
+  const { driver: driverId, photo, submission } = await searchParams;
   if (typeof driverId !== 'string' || typeof photo !== 'string') notFound();
+  // Set when reviewing a photo a driver sent from an upload link.
+  const submissionId = typeof submission === 'string' && UUID.test(submission) ? submission : undefined;
 
   // The photo must be in this company's folder, for this driver.
   if (!photo.startsWith(`${company.id}/${driverId}/`)) notFound();
@@ -44,7 +48,7 @@ async function Review({ searchParams }: { searchParams: PageProps<'/documents/re
 
   return (
     <div className={styles.review}>
-      <p className={styles.sub}>{driver.first_name} {driver.last_name}</p>
+      <p className={styles.sub}>{driver.first_name} {driver.last_name}{submissionId && <> · sent by the driver · <Link href="/inbox">back to inbox</Link></>}</p>
       {/* eslint-disable-next-line @next/next/no-img-element -- short-lived signed URL */}
       <img src={signed.signedUrl} alt="Uploaded document" className={styles.photo} />
       <Suspense fallback={<p className={styles.note}>Reading the document… this takes a few seconds.</p>}>
@@ -53,13 +57,14 @@ async function Review({ searchParams }: { searchParams: PageProps<'/documents/re
           today={todayIn(company.timeZone)}
           driverId={driverId}
           driver={{ first: driver.first_name, last: driver.last_name }}
+          submissionId={submissionId}
         />
       </Suspense>
     </div>
   );
 }
 
-async function AiFields(props: { photo: string; today: IsoDate; driverId: string; driver: { first: string; last: string } }) {
+async function AiFields(props: { photo: string; today: IsoDate; driverId: string; driver: { first: string; last: string }; submissionId?: string }) {
   const { supabase } = await requireCompany();
   const { data: file, error } = await supabase.storage.from('documents').download(props.photo);
   if (error || !file) return <p role="alert" className={styles.error}>Couldn&apos;t load the photo for reading.</p>;
@@ -80,6 +85,7 @@ async function AiFields(props: { photo: string; today: IsoDate; driverId: string
       notes={x.notes}
       driverId={props.driverId}
       photo={props.photo}
+      submissionId={props.submissionId}
     />
   );
 }

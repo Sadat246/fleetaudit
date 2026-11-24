@@ -9,9 +9,14 @@ import { Nav } from '../../ui/nav';
 import shell from '../../ui/shell.module.css';
 import { dueText, Pill, Stamp } from '../../ui/status';
 import styles from './driver.module.css';
+import { PhoneForm } from './phone-form';
+import { UploadLink } from './upload-link';
+import { formatPhone } from '@/lib/sms/format';
+import { smsMode } from '@/lib/sms/send';
 
 export const metadata: Metadata = { title: 'Driver · FleetAudit' };
 
+const sentAt = new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 export default function DriverPage(props: PageProps<'/drivers/[id]'>) {
@@ -31,15 +36,18 @@ async function DriverDetail({ params }: { params: PageProps<'/drivers/[id]'>['pa
   if (!UUID.test(id)) notFound();
   const { supabase, company } = await requireCompany();
 
-  const [driverRes, docsRes] = await Promise.all([
+  const [driverRes, docsRes, msgRes] = await Promise.all([
     supabase.from('drivers').select('*').eq('id', id).eq('company_id', company.id).maybeSingle(),
     supabase.from('documents').select('*').eq('driver_id', id).eq('company_id', company.id).order('created_at', { ascending: false }),
+    supabase.from('messages').select('id, body, status, detail, created_at').eq('driver_id', id).eq('company_id', company.id).order('created_at', { ascending: false }).limit(5),
   ]);
   if (driverRes.error) throw driverRes.error;
   if (docsRes.error) throw docsRes.error;
   if (!driverRes.data) notFound();
 
   const driver = driverFromRow(driverRes.data as DriverRow);
+  const optedOut = Boolean((driverRes.data as { sms_opt_out?: boolean }).sms_opt_out);
+  const messages = msgRes.data ?? [];
   const rows = docsRes.data as (DocumentRow & { photo_path: string | null; created_at: string })[];
   const today = todayIn(company.timeZone);
   const result = evaluateDriver(driver, rows.map(documentFromRow), today);
@@ -92,6 +100,27 @@ async function DriverDetail({ params }: { params: PageProps<'/drivers/[id]'>['pa
             </li>
           ))}
         </ul>
+      </section>
+
+      <section className={shell.section}>
+        <h2 className={shell.h2}>Ask {driver.first} for a document</h2>
+        <div className={shell.card}>
+          <PhoneForm driverId={driver.id} phone={driver.phone ? formatPhone(driver.phone) : ''} optedOut={optedOut} />
+          <UploadLink driverId={driver.id} driverFirst={driver.first} canText={Boolean(driver.phone) && !optedOut} testMode={smsMode() === 'test'} />
+        </div>
+        {messages.length > 0 && (
+          <ul className={`${shell.card} ${shell.list} ${styles.messages}`} aria-label="Recent texts">
+            {messages.map((m) => (
+              <li key={m.id} className={styles.message}>
+                <span className={m.status === 'sent' ? shell.okText : m.status === 'test' ? shell.warnText : shell.critText}>
+                  {m.status === 'sent' ? 'Sent' : m.status === 'test' ? 'Test (not sent)' : 'Failed'} · {sentAt.format(new Date(m.created_at))}
+                </span>
+                <span className={styles.messageBody}>{m.body}</span>
+                {m.status === 'failed' && m.detail && <span className={styles.cite}>{m.detail}</span>}
+              </li>
+            ))}
+          </ul>
+        )}
       </section>
 
       <section className={shell.section}>

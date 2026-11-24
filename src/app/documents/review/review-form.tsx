@@ -2,19 +2,11 @@
 
 import { useActionState, useState } from 'react';
 import { FIELDS, ISSUED_LABEL, type Draft } from '@/lib/ai/review';
-import { DOC_TYPES, type DocType } from '@/lib/engine';
+import { DOC_TYPE_LABEL, DOC_TYPES, type DocType } from '@/lib/engine';
 import styles from '../documents.module.css';
 import { saveDocument, type SaveState } from './actions';
 
-const TYPE_LABEL: Record<DocType, string> = {
-  MEDICAL_EXAMINER_CERTIFICATE: 'Medical certificate',
-  COMMERCIAL_DRIVERS_LICENSE: 'CDL',
-  ANNUAL_DRIVING_RECORD_REVIEW: 'Annual review',
-  MVR_REPORT: 'MVR (driving record)',
-  DRUG_AND_ALCOHOL_CLEARINGHOUSE_RECORD: 'Clearinghouse query',
-  DRIVER_APPLICATION: 'Driver application',
-  UNKNOWN_OR_UNCORRELATED: 'Choose a type…',
-};
+const TYPE_LABEL: Record<DocType, string> = { ...DOC_TYPE_LABEL, UNKNOWN_OR_UNCORRELATED: 'Choose a type…' };
 
 interface Props {
   draft: Draft;

@@ -1,0 +1,16 @@
+.headSide { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+
+.item { padding: 14px 18px; display: grid; gap: 4px; }
+.itemHead { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+.itemLabel { font-weight: 600; }
+.itemSum { color: var(--ink-2); font-size: 14px; }
+.due { color: var(--ink-3); }
+.issues { margin: 2px 0 0; padding-left: 18px; font-size: 14px; }
+.cite { color: var(--ink-3); font-size: 12.5px; }
+
+.doc { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 14px 18px; }
+.photoLink {
+  color: var(--accent); font-weight: 600; font-size: 14px; white-space: nowrap;
+  padding: 10px 0; min-height: 44px; display: inline-flex; align-items: center;
+}
+.noPhoto { color: var(--ink-3); font-size: 13px; white-space: nowrap; }

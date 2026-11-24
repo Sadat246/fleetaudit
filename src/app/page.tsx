@@ -1,63 +1,31 @@
-import {
-  evaluateDriver,
-  STATUS_RANK,
-  todayIn,
-  fmtDate,
-  type ChecklistItem,
-  type DriverResult,
-  type ItemKey,
-} from '@/lib/engine';
 import Link from 'next/link';
-import { Suspense } from 'react';
 import { redirect } from 'next/navigation';
 import { connection } from 'next/server';
-import { getMyCompany, loadFleet } from '@/lib/db/fleet';
+import { Suspense } from 'react';
+import { getMyCompany, loadScoredFleet } from '@/lib/db/fleet';
+import { dueWithin, fixFirst, fmtDate } from '@/lib/engine';
 import { createClient } from '@/lib/supabase/server';
-import { signOut } from './login/actions';
 import { CompanyForm } from './setup/company-form';
-import styles from './page.module.css';
+import { Nav } from './ui/nav';
+import shell from './ui/shell.module.css';
+import { ItemList } from './ui/item-list';
+import { dueText } from './ui/status';
+import styles from './overview.module.css';
 
-const COLUMNS: [ItemKey, string][] = [
-  ['app', 'Application'], ['inq', 'Prior employers'], ['mvr', 'MVR'], ['annual', 'Annual review'],
-  ['medical', 'Medical card'], ['cdl', 'CDL'], ['clh', 'Clearinghouse'],
-];
-
-const ICON = { ok: '✓', warn: '!', crit: '✕', na: '–' } as const;
-
-function Cell({ item }: { item: ChecklistItem }) {
-  if (item.missing) {
-    return <span className={`${styles.cell} ${styles.miss} ${item.status === 'warn' ? styles.missWarn : ''}`}>{item.key === 'inq' ? 'Open' : 'Missing'}</span>;
-  }
-  if (item.status === 'na') return <span className={`${styles.cell} ${styles.na}`}>n/a</span>;
-  const days = item.days == null || item.days > 999 ? '' : item.days < 0 ? `${-item.days}d late` : `${item.days}d`;
+export default function OverviewPage() {
   return (
-    <span className={`${styles.cell} ${styles[item.status]}`} title={item.sum}>
-      <span aria-hidden="true">{ICON[item.status]}</span> {days}
-    </span>
-  );
-}
-
-function Stamp({ result }: { result: DriverResult }) {
-  const text = result.status === 'ok' ? 'Fully compliant' : result.status === 'warn' ? 'Audit warning' : result.oos ? 'Critical · OOS risk' : 'Critical violation';
-  return <span className={`${styles.stamp} ${styles[result.status]}`}>{text}</span>;
-}
-
-export default function RosterPage() {
-  return (
-    <main className={styles.main}>
-      <p className={styles.brand}>Fleet<span>Audit</span></p>
-      <h1 className={styles.title}>Drivers</h1>
-      <Suspense fallback={<p className={styles.sub}>Loading your fleet…</p>}>
-        <Roster />
+    <main className={shell.main}>
+      <Nav />
+      <Suspense fallback={<p className={shell.sub}>Loading your fleet…</p>}>
+        <Overview />
       </Suspense>
-      <p className={styles.foot}>Screening aid for 49 CFR Part 391 files. Not legal advice or an FMCSA determination.</p>
+      <p className={shell.foot}>Screening aid for 49 CFR Part 391 files. Not legal advice or an FMCSA determination.</p>
     </main>
   );
 }
 
-async function Roster() {
-  // Always render fresh on each request: the login check and "days left"
-  // both depend on the current time, so this can't be prerendered.
+async function Overview() {
+  // Always render fresh: the login check and "days left" depend on the current time.
   await connection();
   const supabase = await createClient();
   const { data: claims } = await supabase.auth.getClaims();
@@ -68,69 +36,62 @@ async function Roster() {
     return (
       <div className={styles.setup}>
         <CompanyForm />
-        <SignOut email={claims.claims.email} />
       </div>
     );
   }
 
-  const today = todayIn(company.timeZone);
-  const { drivers, docs } = await loadFleet(supabase, company.id);
-
-  const rows = drivers
-    .map((dr) => ({ dr, result: evaluateDriver(dr, docs.filter((d) => d.driverId === dr.id), today) }))
-    .sort((a, b) => STATUS_RANK[b.result.status] - STATUS_RANK[a.result.status] || a.dr.last.localeCompare(b.dr.last));
-
-  const counts = { ok: 0, warn: 0, crit: 0 };
-  rows.forEach((r) => counts[r.result.status]++);
+  const { today, rows, counts } = await loadScoredFleet(supabase, company);
+  const fix = fixFirst(rows);
+  const soon = dueWithin(rows, 30).filter((x) => x.item.days! >= 0);
 
   return (
     <>
-      <header className={styles.head}>
-        <p className={styles.sub}>{company.name} · as of {fmtDate(today)}</p>
-        <p className={styles.summary}>
-          <b>{counts.ok}</b> of {rows.length} audit-ready · <b className={styles.critText}>{counts.crit}</b> critical · <b className={styles.warnText}>{counts.warn}</b> warning
-        </p>
-        <Link href="/documents/new" className={styles.addDoc}>+ Add document</Link>
+      <header className={shell.head}>
+        <div>
+          <h1 className={shell.title}>{company.name}</h1>
+          <p className={shell.sub}>Overview as of {fmtDate(today)}</p>
+        </div>
       </header>
 
-      <section className={styles.card}>
-        <div className={styles.scroll}>
-          <table className={styles.table}>
-            <thead>
-              <tr>
-                <th scope="col">Driver</th>
-                {COLUMNS.map(([k, label]) => <th key={k} scope="col">{label}</th>)}
-                <th scope="col">Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              {rows.map(({ dr, result }) => (
-                <tr key={dr.id}>
-                  <td>
-                    <span className={styles.name}>{dr.first} {dr.last}</span>
-                    <span className={styles.meta}>{[dr.cdlState, dr.cdlClass && `Class ${dr.cdlClass}`, dr.cdlNumber].filter(Boolean).join(' · ')}</span>
-                  </td>
-                  {COLUMNS.map(([k]) => (
-                    <td key={k}><Cell item={result.items.find((i) => i.key === k)!} /></td>
-                  ))}
-                  <td><Stamp result={result} /></td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+      <div className={styles.tiles}>
+        <Tile label="Audit-ready" value={`${counts.ok} of ${counts.total}`} tone="ok" href="/drivers" />
+        <Tile label="Critical" value={counts.crit} tone={counts.crit ? 'crit' : 'ok'} href="/drivers" />
+        <Tile label="Warnings" value={counts.warn} tone={counts.warn ? 'warn' : 'ok'} href="/drivers" />
+        <Tile label="Due in 30 days" value={soon.length} tone={soon.length ? 'warn' : 'ok'} href="/renewals" />
+      </div>
+
+      <section className={shell.section}>
+        <h2 className={shell.h2}>Fix first</h2>
+        <div className={shell.card}>
+          {fix.length === 0 ? (
+            <p className={shell.empty}>Nothing critical. Every driver can legally drive.</p>
+          ) : (
+            <ItemList items={fix.slice(0, 8)} side={(x) => x.item.risk === 'Out of service' ? 'Out-of-service risk' : x.item.cite} />
+          )}
         </div>
-        {rows.length === 0 && <p className={styles.empty}>No drivers yet. Adding drivers comes in Week 2.</p>}
+        {fix.length > 8 && <p className={styles.more}><Link href="/drivers">See all {fix.length} on the Drivers page →</Link></p>}
       </section>
-      <SignOut email={claims.claims.email} />
+
+      <section className={shell.section}>
+        <h2 className={shell.h2}>Coming due in 30 days</h2>
+        <div className={shell.card}>
+          {soon.length === 0 ? (
+            <p className={shell.empty}>Nothing due in the next 30 days.</p>
+          ) : (
+            <ItemList items={soon.slice(0, 6)} side={(x) => dueText(x.item.days)} />
+          )}
+        </div>
+        <p className={styles.more}><Link href="/renewals">All renewals for the next 60 days →</Link></p>
+      </section>
     </>
   );
 }
 
-function SignOut({ email }: { email?: string }) {
+function Tile({ label, value, tone, href }: { label: string; value: string | number; tone: 'ok' | 'warn' | 'crit'; href: string }) {
   return (
-    <form action={signOut} className={styles.account}>
-      <span>Signed in as {email}</span>
-      <button type="submit" className={styles.signOut}>Sign out</button>
-    </form>
+    <Link href={href} className={`${styles.tile} ${styles[tone]}`}>
+      <span className={styles.tileValue}>{value}</span>
+      <span className={styles.tileLabel}>{label}</span>
+    </Link>
   );
 }

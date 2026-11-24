@@ -11,6 +11,16 @@ export const DOC_TYPES = [
 ] as const;
 export type DocType = (typeof DOC_TYPES)[number];
 
+export const DOC_TYPE_LABEL: Record<DocType, string> = {
+  MEDICAL_EXAMINER_CERTIFICATE: 'Medical certificate',
+  COMMERCIAL_DRIVERS_LICENSE: 'CDL',
+  ANNUAL_DRIVING_RECORD_REVIEW: 'Annual review',
+  MVR_REPORT: 'MVR (driving record)',
+  DRUG_AND_ALCOHOL_CLEARINGHOUSE_RECORD: 'Clearinghouse query',
+  DRIVER_APPLICATION: 'Driver application',
+  UNKNOWN_OR_UNCORRELATED: 'Unknown document',
+};
+
 export interface Driver {
   id: string;
   first: string;

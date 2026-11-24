@@ -1,6 +1,3 @@
-.main { max-width: 640px; margin: 0 auto; padding: 24px 0 48px; }
-.back { color: var(--accent); text-decoration: none; font-size: 14px; }
-.back:hover { text-decoration: underline; }
 .title { font: 700 clamp(28px, 5vw, 36px)/1 var(--f-display); letter-spacing: .015em; text-transform: uppercase; margin: 14px 0 18px; }
 .sub { color: var(--ink-2); }
 

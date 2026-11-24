@@ -73,5 +73,5 @@ export async function saveDocument(_prev: SaveState, formData: FormData): Promis
   });
   if (error) return { error: `Saving failed: ${error.message}` };
 
-  redirect('/');
+  redirect(`/drivers/${f.driverId}`);
 }

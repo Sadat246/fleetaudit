@@ -1,6 +1,6 @@
 import 'server-only';
 import type { SupabaseClient } from '@supabase/supabase-js';
-import { buildSampleFleet, type DqDocument, type Driver, type IsoDate } from '@/lib/engine';
+import { buildSampleFleet, scoreFleet, todayIn, type DqDocument, type Driver, type IsoDate } from '@/lib/engine';
 import { documentFromRow, documentToRow, driverFromRow, driverToRow, type DocumentRow, type DriverRow } from './mappers';
 
 export interface Company {
@@ -48,4 +48,11 @@ export async function seedSampleFleet(supabase: SupabaseClient, companyId: strin
   if (a.error) throw a.error;
   const b = await supabase.from('documents').insert(docs);
   if (b.error) throw b.error;
+}
+
+/** Loads a company's fleet and scores it as of today in the company's time zone. */
+export async function loadScoredFleet(supabase: SupabaseClient, company: Company) {
+  const today = todayIn(company.timeZone);
+  const { drivers, docs } = await loadFleet(supabase, company.id);
+  return { today, ...scoreFleet(drivers, docs, today) };
 }

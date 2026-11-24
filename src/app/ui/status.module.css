@@ -1,0 +1,21 @@
+.cell {
+  display: inline-flex; align-items: center; justify-content: center; gap: 4px;
+  min-width: 62px; height: 36px; padding: 0 6px; border-radius: 5px; font: 500 12px/1 var(--f-mono);
+}
+.ok { background: var(--ok-soft); color: var(--ok); }
+.warn { background: var(--warn-soft); color: var(--warn); }
+.crit { background: var(--crit-soft); color: var(--crit); }
+.na { background: var(--surface-2); color: var(--ink-3); }
+.miss { border: 1.5px dashed var(--crit); color: var(--crit); background: none; }
+.missWarn { border-color: var(--warn); color: var(--warn); }
+
+.stamp {
+  display: inline-flex; padding: 5px 8px 4px; border: 1.5px solid currentColor; border-radius: 3px;
+  font: 700 12.5px/1 var(--f-display); letter-spacing: .09em; text-transform: uppercase; white-space: nowrap;
+}
+.stamp.ok, .stamp.warn, .stamp.crit { background: none; }
+
+.pill {
+  display: inline-flex; align-items: center; padding: 3px 8px; border-radius: 999px;
+  font: 600 12px/1.2 var(--f-body); white-space: nowrap;
+}

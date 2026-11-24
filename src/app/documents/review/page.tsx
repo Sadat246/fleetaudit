@@ -7,14 +7,17 @@ import { requireCompany } from '@/lib/db/session';
 import { todayIn, type IsoDate } from '@/lib/engine';
 import { reviewChecks, toDraft } from '@/lib/ai/review';
 import { ReviewForm } from './review-form';
+import { Nav } from '../../ui/nav';
+import shell from '../../ui/shell.module.css';
 import styles from '../documents.module.css';
 
 export const metadata: Metadata = { title: 'Review document · FleetAudit' };
 
 export default function ReviewPage(props: PageProps<'/documents/review'>) {
   return (
-    <main className={styles.main}>
-      <Link href="/" className={styles.back}>← Drivers</Link>
+    <main className={`${shell.main} ${shell.narrow}`}>
+      <Nav />
+      <Link href="/drivers" className={shell.back}>← Drivers</Link>
       <h1 className={styles.title}>Review document</h1>
       <Suspense fallback={<p className={styles.sub}>Loading…</p>}>
         <Review searchParams={props.searchParams} />

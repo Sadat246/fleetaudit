@@ -1,0 +1,18 @@
+.setup { max-width: 440px; }
+
+.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; }
+.tile {
+  display: grid; gap: 6px; padding: 16px 18px; border-radius: 10px; text-decoration: none;
+  background: var(--surface); border: 1px solid var(--line); border-top: 4px solid var(--line-2);
+}
+.tile:hover { border-color: var(--line-2); }
+.tileValue { font: 700 32px/1 var(--f-display); color: var(--ink); }
+.tileLabel { font-size: 14px; color: var(--ink-2); }
+.ok { border-top-color: var(--ok-bar); }
+.warn { border-top-color: var(--warn-bar); }
+.crit { border-top-color: var(--crit-bar); }
+.crit .tileValue { color: var(--crit); }
+.warn .tileValue { color: var(--warn); }
+
+.more { margin-top: 10px; font-size: 14px; }
+.more a { color: var(--accent); }

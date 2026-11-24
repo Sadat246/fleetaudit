@@ -2,6 +2,8 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { Suspense } from 'react';
 import { requireCompany } from '@/lib/db/session';
+import { Nav } from '../../ui/nav';
+import shell from '../../ui/shell.module.css';
 import styles from '../documents.module.css';
 import { UploadForm } from './upload-form';
 
@@ -9,8 +11,9 @@ export const metadata: Metadata = { title: 'Add a document · FleetAudit' };
 
 export default function NewDocumentPage(props: PageProps<'/documents/new'>) {
   return (
-    <main className={styles.main}>
-      <Link href="/" className={styles.back}>← Drivers</Link>
+    <main className={`${shell.main} ${shell.narrow}`}>
+      <Nav />
+      <Link href="/drivers" className={shell.back}>← Drivers</Link>
       <h1 className={styles.title}>Add a document</h1>
       <Suspense fallback={<p className={styles.sub}>Loading…</p>}>
         <Upload searchParams={props.searchParams} />

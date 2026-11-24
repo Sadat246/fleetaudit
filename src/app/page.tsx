@@ -7,6 +7,7 @@ import {
   type DriverResult,
   type ItemKey,
 } from '@/lib/engine';
+import Link from 'next/link';
 import { Suspense } from 'react';
 import { redirect } from 'next/navigation';
 import { connection } from 'next/server';
@@ -89,6 +90,7 @@ async function Roster() {
         <p className={styles.summary}>
           <b>{counts.ok}</b> of {rows.length} audit-ready · <b className={styles.critText}>{counts.crit}</b> critical · <b className={styles.warnText}>{counts.warn}</b> warning
         </p>
+        <Link href="/documents/new" className={styles.addDoc}>+ Add document</Link>
       </header>
 
       <section className={styles.card}>

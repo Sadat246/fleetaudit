@@ -1,0 +1,100 @@
+{
+  "01-medical-denise-alvarez.jpg": {
+    "type": "MEDICAL_EXAMINER_CERTIFICATE",
+    "driver": "Denise Alvarez",
+    "issued": "2026-11-18",
+    "expires": "2028-11-18",
+    "examiner": "Dr. Priya Raman",
+    "nrcme": "1234567890",
+    "sigReviewer": true,
+    "problems": []
+  },
+  "02-medical-marcus-webb.jpg": {
+    "type": "MEDICAL_EXAMINER_CERTIFICATE",
+    "driver": "Marcus Webb",
+    "issued": "2026-11-21",
+    "expires": "2027-11-21",
+    "examiner": "Dr. Alan Brooks",
+    "nrcme": "9876543210",
+    "sigReviewer": true,
+    "problems": []
+  },
+  "03-medical-hannah-lindqvist-TOO-LONG.jpg": {
+    "type": "MEDICAL_EXAMINER_CERTIFICATE",
+    "driver": "Hannah Lindqvist",
+    "issued": "2026-10-02",
+    "expires": "2028-11-02",
+    "examiner": "Dr. Priya Raman",
+    "nrcme": "1234567890",
+    "sigReviewer": true,
+    "problems": [
+      "Expires more than 24 months after the exam"
+    ]
+  },
+  "04-medical-patricia-holloway-NO-SIGNATURE.jpg": {
+    "type": "MEDICAL_EXAMINER_CERTIFICATE",
+    "driver": "Patricia Holloway",
+    "issued": "2026-11-10",
+    "expires": "2028-11-10",
+    "examiner": "Dr. Alan Brooks",
+    "nrcme": "9876543210",
+    "sigReviewer": false,
+    "problems": [
+      "Examiner signature missing"
+    ]
+  },
+  "05-medical-omar-haddad-SHORT-REGISTRY.jpg": {
+    "type": "MEDICAL_EXAMINER_CERTIFICATE",
+    "driver": "Omar Haddad",
+    "issued": "2026-09-15",
+    "expires": "2028-09-15",
+    "examiner": "Dr. Lena Ortiz",
+    "nrcme": "45678123",
+    "sigReviewer": true,
+    "problems": [
+      "Registry number is not 10 digits"
+    ]
+  },
+  "06-cdl-raymond-pike.jpg": {
+    "type": "COMMERCIAL_DRIVERS_LICENSE",
+    "driver": "Raymond Pike",
+    "issued": "2026-11-12",
+    "expires": "2030-11-12",
+    "cdlClass": "A",
+    "endorsements": [
+      "T",
+      "N"
+    ],
+    "restrictions": [],
+    "problems": []
+  },
+  "07-annual-review-raymond-pike.jpg": {
+    "type": "ANNUAL_DRIVING_RECORD_REVIEW",
+    "driver": "Raymond Pike",
+    "issued": "2026-11-19",
+    "sigReviewer": true,
+    "problems": []
+  },
+  "08-clearinghouse-raymond-pike.jpg": {
+    "type": "DRUG_AND_ALCOHOL_CLEARINGHOUSE_RECORD",
+    "driver": "Raymond Pike",
+    "issued": "2026-11-19",
+    "problems": []
+  },
+  "09-mvr-caleb-nguyen.jpg": {
+    "type": "MVR_REPORT",
+    "driver": "Caleb Nguyen",
+    "issued": "2026-11-20",
+    "problems": []
+  },
+  "10-medical-sofia-marchetti-flat-scan.jpg": {
+    "type": "MEDICAL_EXAMINER_CERTIFICATE",
+    "driver": "Sofia Marchetti",
+    "issued": "2026-11-03",
+    "expires": "2028-11-03",
+    "examiner": "Dr. Lena Ortiz",
+    "nrcme": "5550001112",
+    "sigReviewer": true,
+    "problems": []
+  }
+}
